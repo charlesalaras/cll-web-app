@@ -7,11 +7,10 @@ import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
 import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
+import Module from '../components/Module';
 import clientPromise from '../lib/mongodb';
 
 const pages = ["Dashboard", "Assignments", "Performance", "Practice"];
@@ -74,7 +73,7 @@ export default function Home({ isConnected }) {
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
         </h1>
-
+        <Module/>
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
         ) : (
