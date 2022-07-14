@@ -1,6 +1,8 @@
 import { connectToDatabase } from "../util/mongodb";
 import Head from "next/head";
 import Module from "../components/Module";
+import NavBar from "../components/NavBar";
+
 
 export default function TestModule({ module }) {
     return(
@@ -11,6 +13,8 @@ export default function TestModule({ module }) {
             rel="stylesheet"
         />
         </Head>
+
+        <NavBar/>
         <Module {... module }/>
         </>
     );

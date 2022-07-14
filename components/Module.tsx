@@ -8,6 +8,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import Question from "./Question";
 
 type SectionType = {
     title: string,
@@ -35,16 +36,51 @@ export default function Module(props: ModuleProps) {
     const [sectionIterator, setIterator] = useState(0)
 
     function handleNext() {
-        setModuleProgress(moduleProgress + 1);
+        if(sectionIterator < props.sections[moduleProgress].size) {
+            setIterator(sectionIterator + 1);
+        }
+        else {
+            setModuleProgress(moduleProgress + 1);
+            setIterator(0);
+        }
     }
 
     function handlePrev() {
-        setModuleProgress(moduleProgress - 1);
+        if(sectionIterator > 0) {
+            setIterator(sectionIterator - 1);   
+        }
+        else {
+            if(moduleProgress != 0) {
+                setModuleProgress(moduleProgress - 1);
+                setIterator(0);
+            }
+        }
     }
 
+    function handleContent() {
+        if(props.sections[moduleProgress].type == "video") {
+            return (
+                <iframe src={props.sections[moduleProgress].content[sectionIterator]}></iframe>
+            );
+        }
+        else if(props.sections[moduleProgress].type == "question") {
+            /*
+            const questionContent = async (req, res) => {
+                return await fetch("../pages/api/getQuestion");
+            }
+            return (
+                <Question { ... questionContent }></Question>
+            );
+            */
+            return (<div>Question Goes Here</div>);
+        }
+    }
+
+    let content = handleContent();
+
     useEffect(() => {
-       console.log(moduleProgress) 
-    }, [moduleProgress])
+       content = handleContent(); 
+    }, [moduleProgress, sectionIterator])
 
     return(
     <Grid container spacing={2}>
@@ -59,10 +95,13 @@ export default function Module(props: ModuleProps) {
     </Grid>
     <Grid item xs={4}>
         <Typography variant="h5">Module Progress</Typography>
-        <Stepper orientation="vertical">
-            {(props.sections).map((step) => 
+        <Stepper orientation="vertical" activeStep={moduleProgress}>
+            {(props.sections).map((step, index) => 
                 <Step key={step.title}>
-                   <StepLabel>{step.title}</StepLabel> 
+                   <StepLabel>{step.title}</StepLabel>
+                   {index == moduleProgress ? 
+                    <Typography variant="caption">Progress: {((sectionIterator / step.size) * 100).toFixed(1)}%</Typography> 
+                    : null}
                 </Step>
             )}
         </Stepper>
@@ -73,6 +112,7 @@ export default function Module(props: ModuleProps) {
     </Grid>
     <Grid item xs={8}>
         <Paper variant="outlined">
+            {content}
         </Paper>
     </Grid>
     </Grid>

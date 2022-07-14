@@ -1,4 +1,5 @@
 import Latex from "react-latex";
+import FormControl from "@mui/material/FormControl";
 
 interface QuestionProps {
     type: string,
@@ -14,7 +15,7 @@ function Question(props: QuestionProps) {
     const [score, setScore] = useState(0); // Value between 0-1
     const [duration, setDuration] = useState(Date.now()); // End Time - Current Time
 
-    const inputs
+    const inputs = 0;
     return(
         <>
         <Latex>{props.body}</Latex>
