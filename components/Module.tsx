@@ -64,15 +64,9 @@ export default function Module(props: ModuleProps) {
             );
         }
         else if(props.sections[moduleProgress].type == "question") {
-            /*
-            const questionContent = async (req, res) => {
-                return await fetch("../pages/api/getQuestion");
-            }
             return (
-                <Question { ... questionContent }></Question>
+                <Question identifier={props.sections[moduleProgress].content[sectionIterator]}/>
             );
-            */
-            return (<div>Question Goes Here</div>);
         }
     }
 
