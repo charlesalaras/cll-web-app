@@ -7,6 +7,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import useSWR from "swr";
 import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
+import FormGroup from "@mui/material/FormGroup";
 
 interface QuestionProps {
     identifier: string
@@ -38,6 +39,48 @@ export default function Question(props: QuestionProps) {
         }
         // Send a record of answer
 	}
+    
+    function createContent() {
+        if(data.type === "tf") { // True : False
+        return(
+        <RadioGroup
+        	aria-labelledby="demo-radio-buttons-group-label"
+        	name="radio-buttons-group"
+            value={value}
+            onChange={handleRadioChange}
+        >
+			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={answer}/>)}
+        </RadioGroup>);
+        }
+        else if(data.type === "mc") { // Multiple Choice
+        return(
+        <RadioGroup
+        	aria-labelledby="demo-radio-buttons-group-label"
+        	name="radio-buttons-group"
+            value={value}
+            onChange={handleRadioChange}
+        >
+			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={answer}/>)}
+        </RadioGroup>);
+        }
+        else if(data.type === "pm") { // Pick Many
+        return(
+        <FormGroup>
+        </FormGroup>);
+        }
+        else if(data.type === "ic") { // Image Choice
+
+        }
+        else if(data.type === "mi") { // Multiple Images
+
+        }
+        else if(data.type === "fb") { // Fill in the Blank
+
+        }
+        else if(data.type === "mb") { // Multiple Blanks
+
+        }
+    }
 
 	console.log(data.answers.map((answer) => <li>{answer}</li>));
     return(
@@ -47,16 +90,9 @@ export default function Question(props: QuestionProps) {
 		<form onSubmit={checkAnswer}>
     	<FormControl>
         <FormLabel id="demo-radio-buttons-group-label">Answers</FormLabel>
-        <RadioGroup
-        	aria-labelledby="demo-radio-buttons-group-label"
-        	name="radio-buttons-group"
-            value={value}
-            onChange={handleRadioChange}
-        >
-			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={answer}/>)}
-        </RadioGroup>
-		<Button variant="contained" type="submit">Submit</Button>
-    	</FormControl>
+		{createContent()}
+        <Button variant="contained" type="submit">Submit</Button>
+        </FormControl>
         </form>
         </>
     );
