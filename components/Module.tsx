@@ -77,17 +77,17 @@ export default function Module(props: ModuleProps) {
     }, [moduleProgress, sectionIterator])
 
     return(
-    <Grid container spacing={2}>
-    <Grid item xs={8}>
+    <Grid container spacing={2} sx={{ width: '100vw', height: '80vh'}}>
+    <Grid item xs={9}>
     <Typography variant="h3">Moments of Forces</Typography>
     </Grid>
-    <Grid item xs={4}>
-        <ButtonGroup variant="contained">
+    <Grid item xs={3}>
+        <ButtonGroup variant="contained" sx={{margin: '5%'}}>
             <Button>❌ Close without Saving</Button>
             <Button>💾 Save and Close</Button>
         </ButtonGroup>
     </Grid>
-    <Grid item xs={4}>
+    <Grid item xs={3} sx={{height: '100%'}}>
         <Typography variant="h5">Module Progress</Typography>
         <Stepper orientation="vertical" activeStep={moduleProgress}>
             {(props.sections).map((step, index) => 
@@ -104,8 +104,11 @@ export default function Module(props: ModuleProps) {
             <Button onClick={handleNext}>Next ▶</Button>
         </ButtonGroup>
     </Grid>
-    <Grid item xs={8}>
-        <Paper variant="outlined">
+    <Grid item xs={9}>
+        <Paper 
+            elevation={8}
+            sx={{height: '100%', boxSizing: 'border-box', padding: '20px'}}
+        >
             {content}
         </Paper>
     </Grid>
