@@ -49,7 +49,7 @@ export default function Question(props: QuestionProps) {
             value={value}
             onChange={handleRadioChange}
         >
-			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={answer}/>)}
+			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={<Latex>{answer}</Latex>}/>)}
         </RadioGroup>);
         }
         else if(data.type === "mc") { // Multiple Choice
@@ -60,7 +60,7 @@ export default function Question(props: QuestionProps) {
             value={value}
             onChange={handleRadioChange}
         >
-			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={answer}/>)}
+			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={<Latex>{answer}</Latex>}/>)}
         </RadioGroup>);
         }
         else if(data.type === "pm") { // Pick Many

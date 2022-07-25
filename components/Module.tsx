@@ -36,7 +36,7 @@ export default function Module(props: ModuleProps) {
     const [sectionIterator, setIterator] = useState(0)
 
     function handleNext() {
-        if(sectionIterator < props.sections[moduleProgress].size) {
+        if(sectionIterator < props.sections[moduleProgress].size - 1) {
             setIterator(sectionIterator + 1);
         }
         else {
@@ -60,7 +60,7 @@ export default function Module(props: ModuleProps) {
     function handleContent() {
         if(props.sections[moduleProgress].type == "video") {
             return (
-                <iframe src={props.sections[moduleProgress].content[sectionIterator]}></iframe>
+                <iframe src={props.sections[moduleProgress].content[sectionIterator]} style={{height: '100%', width: '100%'}}></iframe>
             );
         }
         else if(props.sections[moduleProgress].type == "question") {
@@ -77,7 +77,7 @@ export default function Module(props: ModuleProps) {
     }, [moduleProgress, sectionIterator])
 
     return(
-    <Grid container spacing={2} sx={{ width: '100vw', height: '80vh'}}>
+    <Grid container spacing={2} sx={{ width: '100vw', height: '70vh'}}>
     <Grid item xs={9}>
     <Typography variant="h3">Moments of Forces</Typography>
     </Grid>
@@ -89,12 +89,12 @@ export default function Module(props: ModuleProps) {
     </Grid>
     <Grid item xs={3} sx={{height: '100%'}}>
         <Typography variant="h5">Module Progress</Typography>
-        <Stepper orientation="vertical" activeStep={moduleProgress}>
+        <Stepper orientation="vertical" activeStep={moduleProgress} sx={{height: '100%'}}>
             {(props.sections).map((step, index) => 
                 <Step key={step.title}>
                    <StepLabel>{step.title}</StepLabel>
                    {index == moduleProgress ? 
-                    <Typography variant="caption">Progress: {((sectionIterator / step.size) * 100).toFixed(1)}%</Typography> 
+                    <Typography variant="caption">Progress: {((sectionIterator / (step.size)) * 100).toFixed(1)}%</Typography> 
                     : null}
                 </Step>
             )}
