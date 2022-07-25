@@ -40,6 +40,13 @@ export default function Question(props: QuestionProps) {
         // Send a record of answer
 	}
     
+    function renderFigures() {
+        return (
+            <>
+            {data.figures.map((figure) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
+            </>);
+    }
+
     function createContent() {
         if(data.type === "tf") { // True : False
         return(
@@ -82,7 +89,6 @@ export default function Question(props: QuestionProps) {
         }
     }
 
-	console.log(data.answers.map((answer) => <li>{answer}</li>));
     return(
         <>
         <Latex>{String(data.body)}</Latex>
@@ -94,6 +100,7 @@ export default function Question(props: QuestionProps) {
         <Button variant="contained" type="submit">Submit</Button>
         </FormControl>
         </form>
+        {renderFigures()}
         </>
     );
 }
