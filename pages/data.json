@@ -10,7 +10,7 @@
     {"node":7,"name":"Free Body Diagram"},
     {"node":8,"name":"2D Equilibrium"},
     {"node":9,"name":"2D Trusses"},
-    {"node":10,"name":"2D Frame Machines?"},
+    {"node":10,"name":"2D Frame Machines"},
     {"node":11,"name":"Center of Mass, Simple Bodies"},
     {"node":12,"name":"Center of Mass, Composite"},
     {"node":13,"name":"Distributed Loads"},
