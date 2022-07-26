@@ -1,20 +1,7 @@
-import Head from 'next/head'
-import AppBar from '@mui/material/AppBar';
-import Typography from '@mui/material/Typography';
-import Container from '@mui/material/Container';
-import IconButton from '@mui/material/IconButton';
-import Toolbar from '@mui/material/Toolbar';
-import Box from '@mui/material/Box';
-import Tooltip from '@mui/material/Tooltip';
-import Avatar from '@mui/material/Avatar';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
-import Switch from '@mui/material/Switch';
-import FormControlLabel from '@mui/material/FormControlLabel';
+import Head from 'next/head';
 import Button from '@mui/material/Button';
 import clientPromise from '../lib/mongodb';
-
-const pages = ["Dashboard", "Assignments", "Performance", "Practice"];
+import NavBar from '../components/NavBar';
 
 export default function Home({ isConnected }) {
   return (
@@ -24,57 +11,11 @@ export default function Home({ isConnected }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
+      <NavBar/>
       <main>
-	<AppBar position="static">
-	  <Container maxWidth="x1">
-	  <Toolbar disableGutters>
-	  <Typography
-	   variant="h6"
-	   noWrap
-	   component="a"
-	   href="/"
-	   sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-	   }}
-	  >
-	  CALIFORNIA LEARNING LABS
-	  </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box>
-	  <Box sx={{ flexGrow: 0 }}>
-	    <FormControlLabel
-	    control={<Switch color="default"/>}
-	    label="Light/Dark Mode"
-	    />
-	  </Box>
-	  <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp"/>
-              </IconButton>
-	    </Tooltip>
-	  </Box>
-	  </Toolbar>
-	  </Container>
-	</AppBar>
         <h1 className="title">
           Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
         </h1>
-
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
         ) : (

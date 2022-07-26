@@ -12,10 +12,13 @@
     "chroma-js": "^2.4.2",
     "d3": "^7.5.0",
     "d3-sankey": "^0.12.3",
+    "katex": "^0.16.0",
     "mongodb": "^4.1.3",
     "next": "latest",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-latex": "^2.0.0",
+    "swr": "^1.3.0"
   },
   "devDependencies": {
     "typescript": "^4.7.3"
