@@ -12,7 +12,7 @@ const SankeyNode = ({ name, x0, x1, y0, y1, color, svgWidth }) => (
       style={{
         fill: "black",
         alignmentBaseline: "middle",
-        fontSize: 9,
+        fontSize: 12,
         textAnchor: x0 < svgWidth / 2 ? "start" : "end",
         pointerEvents: "none",
         userSelect: "none"
@@ -65,6 +65,7 @@ const SankeyChart = ({ data = {}, dimensions = {} }) => {
         ))}
         {links.map((link, i) => (
           <SankeyLink
+            key={i}
             link={link}
             color={color(colorScale(link.source.index)).hex()}
           />
