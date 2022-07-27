@@ -34,11 +34,18 @@ export default function Module(props: ModuleProps) {
     const [moduleProgress, setModuleProgress] = useState(0)
     const [moduleScore, setModuleScore] = useState(0)
     const [sectionIterator, setIterator] = useState(0)
-
+    const [questionSuccess, setSuccess] = useState(false)
+    function setPassage(result: boolean) {
+        setSuccess(result)
+    }
     function handleNext() {
+        // Still within a section
         if(sectionIterator < props.sections[moduleProgress].size - 1) {
-            setIterator(sectionIterator + 1);
+            if(props.sections[moduleProgress].type == "question" && questionSuccess == true) {
+                setIterator(sectionIterator + 1);
+            }
         }
+        // Outside of the section
         else {
             setModuleProgress(moduleProgress + 1);
             setIterator(0);
@@ -65,7 +72,7 @@ export default function Module(props: ModuleProps) {
         }
         else if(props.sections[moduleProgress].type == "question") {
             return (
-                <Question identifier={props.sections[moduleProgress].content[sectionIterator]}/>
+                <Question identifier={props.sections[moduleProgress].content[sectionIterator]} success={setPassage}/>
             );
         }
     }
