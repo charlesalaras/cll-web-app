@@ -48,8 +48,20 @@ export default function Question(props: QuestionProps) {
         if(value === '') {
             setHelperText('Please select an option.');
             setError(true);
+            return;
         }
-        else if(value === data.correct[0]) { // FIXME: Rudimentary implementation only, need to handle multi answer case
+        const time = new Date(Date.now());
+        var responseObject = {
+            "iso8601": time.toISOString(),
+            "name": "",
+            "verb": "answered",
+            "question": "",
+            "variant": "",
+            "answer": "",
+            "correct": false,
+            "duration": (Date.now() - duration) / 1000,
+        }
+        if(value === data.correct[0]) { // FIXME: Rudimentary implementation only, need to handle multi answer case
             // Disable submit button here
             setHelperText('Correct! Select \'Next\' to continue.');
             setError(false);
@@ -63,6 +75,13 @@ export default function Question(props: QuestionProps) {
             setAttempts(attempts - 1);
         }
         // Send a record of answer
+        fetch('/api/record', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(responseObject),
+        })
 	}
     
     function renderFigures() {
