@@ -17,13 +17,16 @@ export default function Home({ isConnected }) {
                 <title>Create Next App</title>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-        {session ? 
+        {session ?
+            <>
+            <NavBar/>
             <Card>
                 <CardContent>
                     <Typography>Signed in as {session.user.email}</Typography>
                 </CardContent>
                 <Button onClick={() => signOut()}>Sign Out</Button>
             </Card>
+            </>
             : <div>ERROR: Not logged in! How are you here?</div>
         }
         {isConnected ? (
