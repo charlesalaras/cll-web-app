@@ -140,9 +140,9 @@ export default function Question(props: QuestionProps) {
         }
         else if(data.type === "ic") { // Image Choice
         return(
-        <FormGroup>
-            {data.answers.map((answer) => <FormControlLabel key={answer} value={answer} control={<Radio/>} label={}}/>)}
-        </FormGroup>
+        <RadioGroup>
+            {data.answers.map((answer) => <FormControlLabel key={answer} value={answer} control={<Radio/>}/>)}
+        </RadioGroup>
         );
         }
         else if(data.type === "mi") { // Multiple Images
