@@ -72,7 +72,10 @@ export default function Module(props: ModuleProps) {
         }
         else if(props.sections[moduleProgress].type == "question") {
             return (
-                <Question identifier={props.sections[moduleProgress].content[sectionIterator]} success={setPassage}/>
+                <Question
+                    key={props.sections[moduleProgress].content[sectionIterator]}
+                    identifier={props.sections[moduleProgress].content[sectionIterator]} 
+                    success={setPassage}/>
             );
         }
     }
