@@ -13,6 +13,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowLeft from "@mui/icons-material/ArrowLeft";
 import ArrowRight from "@mui/icons-material/ArrowRight";
 import Question from "./Question";
+import { useSession } from "next-auth/react";
 
 type SectionType = {
     title: string,
@@ -35,6 +36,8 @@ export default function Module(props: ModuleProps) {
      * - Module Score
      * - Section Iterator
      */
+    const { data: session } = useSession();
+
     const [moduleProgress, setModuleProgress] = useState(0)
     const [moduleScore, setModuleScore] = useState(0)
     const [sectionIterator, setIterator] = useState(0)
@@ -96,6 +99,24 @@ export default function Module(props: ModuleProps) {
             );
         }
     }
+
+    function handleSave() {
+        const time = new Date(Date.now());
+        var completionObject = {
+            "iso8601": time.toISOString(),
+            "name": String(session.user.name),
+            "module": props._id,
+            "currentScore": moduleScore,
+            "moduleProgress": moduleProgress,
+        }
+        fetch('/api/sendCompletion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(completionObject),
+        }) 
+    }
     /*
     let content = handleContent();
 
@@ -111,7 +132,7 @@ export default function Module(props: ModuleProps) {
     <Grid item xs={3}>
         <ButtonGroup variant="contained" sx={{margin: '5%'}}>
             <Button startIcon={<CloseIcon/>}>Close without Saving</Button>
-            <Button startIcon={<SaveIcon/>}>Save and Close</Button>
+            <Button startIcon={<SaveIcon/>} onClick={handleSave}>Save and Close</Button>
         </ButtonGroup>
     </Grid>
     <Grid item xs={3} sx={{height: '100%'}}>

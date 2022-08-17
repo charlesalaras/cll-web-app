@@ -17,7 +17,7 @@ import CheckBox from "@mui/material/Checkbox";
 interface QuestionProps {
     identifier: string,
     success: (arg0: boolean) => void,
-    passClearStateFunc: (params: any) => void,
+    //passClearStateFunc: (params: any) => void,
 }
 
 const fetcher = async (url) => fetch(url).then((res) => res.json());
@@ -55,6 +55,7 @@ export default function Question(props: QuestionProps) {
         setValue(event.target.value);
     }
     // Resets the component's state on parent reRender
+    /*
     function clearState() { // FIXME: How do we let them return safely?
         setDisable(false);
         setError(false);
@@ -65,7 +66,7 @@ export default function Question(props: QuestionProps) {
         setDuration(Date.now()); // FIXME: How should we calculate and send duration to records?
     }
     props.passClearStateFunc(clearState);
-
+    */
 	function checkAnswer(e) {
         e.preventDefault();
         if(value === '') {
@@ -99,6 +100,7 @@ export default function Question(props: QuestionProps) {
             props.success(true); // FIXME: Still have to let them pass even if they failed
             setValue('');
             responseObject.correct = true;
+            setDisable(true);
         }
         else {
             setHelperText('Incorrect!');
