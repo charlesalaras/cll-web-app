@@ -1,21 +1,34 @@
 import Head from 'next/head';
 import Button from '@mui/material/Button';
-import clientPromise from '../lib/mongodb';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import GoogleIcon from '@mui/icons-material/Google';
 import NavBar from '../components/NavBar';
+import { signOut, useSession } from 'next-auth/react';
+import clientPromise from '../lib/mongodb'
 
 export default function Home({ isConnected }) {
-  return (
-    <div className="container">
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <NavBar/>
-      <main>
-        <h1 className="title">
-          Welcome to <a href="https://nextjs.org">Next.js with MongoDB!</a>
-        </h1>
+    const { data: session } = useSession();
+    
+    return (
+        <div className="container">
+            <Head>
+                <title>Create Next App</title>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
+        {session ?
+            <>
+            <NavBar/>
+            <Card>
+                <CardContent>
+                    <Typography>Signed in as {session.user.email}</Typography>
+                </CardContent>
+                <Button onClick={() => signOut()}>Sign Out</Button>
+            </Card>
+            </>
+            : <div>ERROR: Not logged in! How are you here?</div>
+        }
         {isConnected ? (
           <h2 className="subtitle">You are connected to MongoDB</h2>
         ) : (
@@ -24,10 +37,8 @@ export default function Home({ isConnected }) {
             for instructions.
           </h2>
         )}
-        <Button variant="contained">Hello World!</Button>
-      </main>
-    </div>
-  )
+        </div>
+    )
 }
 
 export async function getServerSideProps(context) {

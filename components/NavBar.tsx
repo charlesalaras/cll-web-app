@@ -12,10 +12,12 @@ import Button from '@mui/material/Button';
 import DarkMode from "@mui/icons-material/DarkMode";
 import Logo from '../public/logo.svg';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import { useSession, signOut } from 'next-auth/react';
 
 const pages = ["Dashboard", "Assignments", "Performance", "Practice"];
 
 export default function NavBar() {
+    const { data: session } = useSession();
     return(
 	<AppBar position="static">
 	  <Container maxWidth="xl">
@@ -40,7 +42,7 @@ export default function NavBar() {
 	  <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp"/>
+                <Avatar alt="Remy Sharp" src={session === undefined ?  "" : String(session.user.image)}/>
               </IconButton>
 	    </Tooltip>
 	  </Box>

@@ -9,6 +9,10 @@ import FormLabel from "@mui/material/FormLabel";
 import Button from "@mui/material/Button";
 import FormGroup from "@mui/material/FormGroup";
 import FormHelperText from "@mui/material/FormHelperText";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import { useSession } from "next-auth/react";
+import CheckBox from "@mui/material/Checkbox";
 
 interface QuestionProps {
     identifier: string,
@@ -21,23 +25,27 @@ const fetcher = async (url) => fetch(url).then((res) => res.json());
 export default function Question(props: QuestionProps) {
     // Grab question data
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
+    const { data: session } = useSession();
 
+    const [apiError, setAPIError] = useState("");
     const [formError, setError] = useState(false);
     const [helperText, setHelperText] = useState(' ');
     const [value, setValue] = useState('');
     const [attempts, setAttempts] = useState(0); // Number of used attempts
+
+    const [score, setScore] = useState(0); // Value between 0-1
+    const [duration, setDuration] = useState(Date.now()); // End Time - Current Time 
 
     useEffect(() => { // Update important info on first contentful render
         if(!data) return;
         if(data.attempts) {
             setAttempts(data.attempts);
         }
+        setDuration(Date.now()); // FIXME: This doesn't update correctly?
     }, [data]);
 
-    const [score, setScore] = useState(0); // Value between 0-1
-    const [duration, setDuration] = useState(Date.now()); // End Time - Current Time
     const [disableButton, setDisable] = useState(false);
-
+    
     if(error) return ('An error has occurred')
     if(!data) return ('Loading')
   
@@ -63,13 +71,34 @@ export default function Question(props: QuestionProps) {
         if(value === '') {
             setHelperText('Please select an option.');
             setError(true);
+            return;
         }
-        else if(value === data.correct[0]) { // FIXME: Rudimentary implementation only, need to handle multi answer case
-            setDisable(true);
+        const time = new Date(Date.now());
+        if(session) {
+            setAPIError("");
+            var userName = session.user.name;
+        }
+        else {
+            setAPIError("Invalid session token!");
+            return;
+        }
+        var responseObject = {
+            "iso8601": time.toISOString(),
+            "name": String(userName),
+            "verb": "answered",
+            "question": props.identifier,
+            "variant": "",
+            "answer": String(value),
+            "correct": false,
+            "duration": (Date.now() - duration) / 1000,
+        }
+        if(value === data.correct[0]) { // FIXME: Rudimentary implementation only, need to handle multi answer case
+            // Disable submit button here
             setHelperText('Correct! Select \'Next\' to continue.');
             setError(false);
             props.success(true); // FIXME: Still have to let them pass even if they failed
             setValue('');
+            responseObject.correct = true;
         }
         else {
             setHelperText('Incorrect!');
@@ -83,6 +112,15 @@ export default function Question(props: QuestionProps) {
             setDisable(true);
         }
         // Send a record of answer
+        // console.log(responseObject);
+
+        fetch('/api/record', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(responseObject),
+        })
 	}
     
     function renderFigures() {
@@ -112,16 +150,21 @@ export default function Question(props: QuestionProps) {
             value={value}
             onChange={handleRadioChange}
         >
-			{data.answers.map((answer) => <FormControlLabel value={answer} control={<Radio/>} label={<Latex>{answer}</Latex>}/>)}
+			{data.answers.map((answer) => <FormControlLabel key={answer} value={answer} control={<Radio/>} label={<Latex>{answer}</Latex>}/>)}
         </RadioGroup>);
         }
         else if(data.type === "pm") { // Pick Many
         return(
         <FormGroup>
+            {data.answers.map((answer) => <FormControlLabel key={answer} value={answer} control={<Checkbox/>} label={<Latex>{answer}</Latex>}/>)}
         </FormGroup>);
         }
         else if(data.type === "ic") { // Image Choice
-
+        return(
+        <RadioGroup>
+            {data.answers.map((answer) => <FormControlLabel key={answer} value={answer} control={<Radio/>}/>)}
+        </RadioGroup>
+        );
         }
         else if(data.type === "mi") { // Multiple Images
 
@@ -151,6 +194,13 @@ export default function Question(props: QuestionProps) {
         </form>
         <div>{attempts} attempts remaining.</div>
         {renderFigures()}
+        { apiError === "" ? 
+          null 
+        : 
+        <Alert severity="error">
+            <AlertTitle>API Error</AlertTitle>
+            Alert: {apiError}
+        </Alert> }
         </>
     );
 }
