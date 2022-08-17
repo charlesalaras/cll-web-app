@@ -17,11 +17,13 @@ import CheckBox from "@mui/material/Checkbox";
 interface QuestionProps {
     identifier: string,
     success: (arg0: boolean) => void,
+    passClearStateFunc: (params: any) => void,
 }
 
 const fetcher = async (url) => fetch(url).then((res) => res.json());
 
 export default function Question(props: QuestionProps) {
+    // Grab question data
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
     const { data: session } = useSession();
 
@@ -42,6 +44,8 @@ export default function Question(props: QuestionProps) {
         setDuration(Date.now()); // FIXME: This doesn't update correctly?
     }, [data]);
 
+    const [disableButton, setDisable] = useState(false);
+    
     if(error) return ('An error has occurred')
     if(!data) return ('Loading')
   
@@ -50,6 +54,18 @@ export default function Question(props: QuestionProps) {
         setError(false);
         setValue(event.target.value);
     }
+    // Resets the component's state on parent reRender
+    function clearState() { // FIXME: How do we let them return safely?
+        setDisable(false);
+        setError(false);
+        setHelperText(' ');
+        setValue('');
+        setAttempts(0);
+        setScore(0);
+        setDuration(Date.now()); // FIXME: How should we calculate and send duration to records?
+    }
+    props.passClearStateFunc(clearState);
+
 	function checkAnswer(e) {
         e.preventDefault();
         if(value === '') {
@@ -80,15 +96,20 @@ export default function Question(props: QuestionProps) {
             // Disable submit button here
             setHelperText('Correct! Select \'Next\' to continue.');
             setError(false);
-            props.success(true);
+            props.success(true); // FIXME: Still have to let them pass even if they failed
             setValue('');
             responseObject.correct = true;
         }
         else {
             setHelperText('Incorrect!');
-            setError(false);
+            setError(true);
             props.success(false);
-            setAttempts(attempts - 1);
+            if(attempts > 0) {
+                setAttempts(attempts - 1);
+            }
+        }
+        if(attempts == 1) {
+            setDisable(true);
         }
         // Send a record of answer
         // console.log(responseObject);
@@ -165,7 +186,10 @@ export default function Question(props: QuestionProps) {
         <FormLabel id="demo-radio-buttons-group-label">Answers</FormLabel>
 		{createContent()}
         <FormHelperText sx={formError ? {color: 'error.main'} : {color: 'success.main'}}>{helperText}</FormHelperText>
-        <Button variant="contained" type="submit">Submit</Button>
+        {disableButton ? 
+            <Button variant="contained" type="submit" disabled>Submit</Button> :
+            <Button variant="contained" type="submit">Submit</Button>
+        }
         </FormControl>
         </form>
         <div>{attempts} attempts remaining.</div>

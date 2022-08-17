@@ -8,6 +8,10 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
+import SaveIcon from "@mui/icons-material/Save";
+import CloseIcon from "@mui/icons-material/Close";
+import ArrowLeft from "@mui/icons-material/ArrowLeft";
+import ArrowRight from "@mui/icons-material/ArrowRight";
 import Question from "./Question";
 
 type SectionType = {
@@ -35,6 +39,17 @@ export default function Module(props: ModuleProps) {
     const [moduleScore, setModuleScore] = useState(0)
     const [sectionIterator, setIterator] = useState(0)
     const [questionSuccess, setSuccess] = useState(false)
+    
+    var clearState = null;
+
+    function assignClear(childClearFunc) {
+        clearState = childClearFunc;
+    }
+    function resetQuestion() {
+        if(clearState) {
+            clearState();
+        }
+    }
     function setPassage(result: boolean) {
         setSuccess(result)
     }
@@ -43,6 +58,8 @@ export default function Module(props: ModuleProps) {
         if(sectionIterator < props.sections[moduleProgress].size - 1) {
             if(props.sections[moduleProgress].type == "question" && questionSuccess == true) {
                 setIterator(sectionIterator + 1);
+                resetQuestion();
+                setSuccess(false);
             }
         }
         // Outside of the section
@@ -79,13 +96,13 @@ export default function Module(props: ModuleProps) {
             );
         }
     }
-
+    /*
     let content = handleContent();
 
     useEffect(() => {
        content = handleContent(); 
     }, [moduleProgress, sectionIterator])
-
+    */
     return(
     <Grid container spacing={2} sx={{ width: '100vw', height: '70vh'}}>
     <Grid item xs={9}>
@@ -93,8 +110,8 @@ export default function Module(props: ModuleProps) {
     </Grid>
     <Grid item xs={3}>
         <ButtonGroup variant="contained" sx={{margin: '5%'}}>
-            <Button>❌ Close without Saving</Button>
-            <Button>💾 Save and Close</Button>
+            <Button startIcon={<CloseIcon/>}>Close without Saving</Button>
+            <Button startIcon={<SaveIcon/>}>Save and Close</Button>
         </ButtonGroup>
     </Grid>
     <Grid item xs={3} sx={{height: '100%'}}>
@@ -110,8 +127,8 @@ export default function Module(props: ModuleProps) {
             )}
         </Stepper>
         <ButtonGroup>
-            <Button onClick={handlePrev}>◀ Previous</Button>
-            <Button onClick={handleNext}>Next ▶</Button>
+            <Button onClick={handlePrev} startIcon={<ArrowLeft/>}>Previous</Button>
+            <Button onClick={handleNext} endIcon={<ArrowRight/>}>Next</Button>
         </ButtonGroup>
     </Grid>
     <Grid item xs={9}>
@@ -119,7 +136,7 @@ export default function Module(props: ModuleProps) {
             elevation={8}
             sx={{height: '100%', boxSizing: 'border-box', padding: '20px'}}
         >
-            {content}
+            {handleContent()}
         </Paper>
     </Grid>
     </Grid>

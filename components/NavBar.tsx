@@ -9,6 +9,9 @@ import Avatar from '@mui/material/Avatar';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
+import DarkMode from "@mui/icons-material/DarkMode";
+import Logo from '../public/logo.svg';
+import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import { useSession, signOut } from 'next-auth/react';
 
 const pages = ["Dashboard", "Assignments", "Performance", "Practice"];
@@ -17,25 +20,9 @@ export default function NavBar() {
     const { data: session } = useSession();
     return(
 	<AppBar position="static">
-	  <Container maxWidth="x1">
+	  <Container maxWidth="xl">
 	  <Toolbar disableGutters>
-	  <Typography
-	   variant="h6"
-	   noWrap
-	   component="a"
-	   href="/"
-	   sx={{
-              mr: 2,
-              display: { xs: 'none', md: 'flex' },
-              fontFamily: 'monospace',
-              fontWeight: 700,
-              letterSpacing: '.3rem',
-              color: 'inherit',
-              textDecoration: 'none',
-	   }}
-	  >
-	  CALIFORNIA LEARNING LABS
-	  </Typography>
+      <SvgIcon component={Logo}/>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
@@ -49,7 +36,7 @@ export default function NavBar() {
 	  <Box sx={{ flexGrow: 0 }}>
 	    <FormControlLabel
 	    control={<Switch color="default"/>}
-	    label="Light/Dark Mode"
+	    label={<DarkMode/>}
 	    />
 	  </Box>
 	  <Box sx={{ flexGrow: 0 }}>
