@@ -20,4 +20,6 @@ interface QuestionProps {
     // Name of user
 }
 
-
+export default function NewQuestion() {
+    return(<div>NewQuestion</div>);
+}
