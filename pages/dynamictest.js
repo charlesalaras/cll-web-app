@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import useSWR from "swr";
+import useSWR, { useSWRConfig } from "swr";
 import Latex from "react-latex";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
@@ -13,12 +13,19 @@ const fetcher = async (url) => fetch(url).then((res) => res.json());
 
 export default function Dynamic() {
     const { data, error } = useSWR("/api/questions/6303f13efc796e579c05925a", fetcher);
-    
+    const { mutate } = useSWRConfig();
+
     const [variant, setVariant] = useState({id: "", params: {}, results: {}});
     const [fetchError, setError] = useState(false);
 
+    useEffect(() => {
+        if(!data) return;
+        setVariant({id: data._id, params: data.params, results: data.params});
+    }, [data]);
+
     if(error) return(<Alert severity="error">Could not fetch question data</Alert>);
     if(!data) return("Data not found!");
+
 
     function replaceParams(body, params) {
         var p = body;
@@ -30,19 +37,27 @@ export default function Dynamic() {
         return p;
     }
 
+    function createAnswers(labels) {
+        var str = labels;
+        const regex = /\<<(.*?)\>>/gm;
+        var objects = str.split(regex);
+        const matches = [...str.matchAll(regex)].map(a => a[1]);
+
+        console.log(objects);
+        return (
+            <div id="answers">
+                {objects.map((object) => {
+                    if(object in matches) { 
+                        <TextField id={object} variant="outlined"></TextField>
+                    }
+                    <div>{object}</div>
+                })}
+            </div>);
+    }
+
     function handleClick() {
-        /*
-        let {varParams, varError} = useSWR("/api/questions/6303f13efc796e579c05925a", fetcher);
-        if(varError) {
-            setError(true);
-        }
-        else {
-            setError(false);
-        }
-        if(!varParams) return;
-        setVariant({id: _id, params: varParams.params, results: varParams.results});
-        */
-        alert('Button clicked!');
+        mutate("/api/questions/6303f13efc796e579c05925a");
+        setVariant({id: data._id, params: data.params, results: data.results});
     }
 
     return(
@@ -57,10 +72,10 @@ export default function Dynamic() {
         <Paper elevation={24} square>
         <Latex>{replaceParams(data.body, variant.params)}</Latex>
         <br></br>
-        <Latex>{data.labels}</Latex>
+        {createAnswers(data.labels)}
         <br></br>
         <img src={data.figures}></img>
-        <p>{`Variant: ${variant._id}`}</p>
+        <p>{`Variant: ${variant.id}`}</p>
         </Paper>
         <Button variant="contained" size="large" onClick={handleClick} color="info" startIcon={<Casino />}>Random</Button>
         {fetchError ? <Alert severity="error">Could not fetch!</Alert> : null}
