@@ -44,13 +44,15 @@ export default function Dynamic() {
         const matches = [...str.matchAll(regex)].map(a => a[1]);
 
         console.log(objects);
-        return (
-            <div id="answers">
+        return ( // NOTE: This only applies to fill in the blank questions.
+            <div id="answers" style={{display: 'inline-flex', alignItems: 'center'}}>
                 {objects.map((object) => {
-                    if(object in matches) { 
-                        <TextField id={object} variant="outlined"></TextField>
+                    if(matches.includes(object)) { 
+                        return (<TextField id={object} label={object} size="small" variant="filled"></TextField>)
                     }
-                    <div>{object}</div>
+                    else {
+                        return(<Latex>{object}</Latex>)
+                    }
                 })}
             </div>);
     }
@@ -69,7 +71,7 @@ export default function Dynamic() {
         />
         </Head>
         <Typography variant="h1" gutterBottom>Dynamic Question Example</Typography>
-        <Paper elevation={24} square>
+        <Paper elevation={24} square style={{lineHeight: "2.5"}}>
         <Latex>{replaceParams(data.body, variant.params)}</Latex>
         <br></br>
         {createAnswers(data.labels)}
