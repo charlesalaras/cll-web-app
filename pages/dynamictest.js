@@ -20,7 +20,7 @@ export default function Dynamic() {
 
     useEffect(() => {
         if(!data) return;
-        setVariant({id: data._id, params: data.params, results: data.params});
+        setVariant({id: data._id, params: data.params, results: data.results});
     }, [data]);
 
     if(error) return(<Alert severity="error">Could not fetch question data</Alert>);
@@ -43,7 +43,6 @@ export default function Dynamic() {
         var objects = str.split(regex);
         const matches = [...str.matchAll(regex)].map(a => a[1]);
 
-        console.log(objects);
         return ( // NOTE: This only applies to fill in the blank questions.
             <div id="answers" style={{display: 'inline-flex', alignItems: 'center'}}>
                 {objects.map((object) => {
@@ -57,6 +56,7 @@ export default function Dynamic() {
             </div>);
     }
 
+    console.log(variant);
     function handleClick() {
         mutate("/api/questions/6303f13efc796e579c05925a");
         setVariant({id: data._id, params: data.params, results: data.results});
@@ -76,6 +76,7 @@ export default function Dynamic() {
         <br></br>
         {createAnswers(data.labels)}
         <br></br>
+        <Typography>{`Correct Answers: ${JSON.stringify(variant.results)}`}</Typography>
         <img src={data.figures}></img>
         <p>{`Variant: ${variant.id}`}</p>
         </Paper>
