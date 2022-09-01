@@ -26,20 +26,18 @@ export default NextAuth({
             }
         })
     ],
-    /*
     callbacks: {
         async signIn({ account, profile }) {
             if(account.provider === "google") {
                 // Might want to fix this later, only accepts .edu accounts
-                return profile.email_verified && profile.email.endsWith(".edu")
+                return profile.email.endsWith(".edu")
             }
             return true // Should never happen
         }
+        async session({ session, token, user }) {
+
+        }
     },
-    strategy: {
-        session: "jwt",
-    },
-    */
     secret: process.env.NEXTAUTH_SECRET,
     database: process.env.MONGODB_URI,
 });
