@@ -54,8 +54,10 @@ npm run dev
 yarn install
 yarn dev
 ```
+(If yarn is installed but the above yarn commands aren't working, try replacing "yarn" with "yarnpkg") 
 
 Your app should be up and running on [http://localhost:3000](http://localhost:3000)! If it doesn't work, post on [GitHub discussions](https://github.com/vercel/next.js/discussions).
+
 
 You will either see a message stating "You are connected to MongoDB" or "You are NOT connected to MongoDB". Ensure that you have provided the correct `MONGODB_URI` environment variable.
 
