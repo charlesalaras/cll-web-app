@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Box from "@mui/material/Box";
 import Step from "@mui/material/Step";
 import Stepper from "@mui/material/Stepper";
@@ -13,6 +13,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CloseIcon from "@mui/icons-material/Close";
 import ArrowLeft from "@mui/icons-material/ArrowLeft";
 import ArrowRight from "@mui/icons-material/ArrowRight";
+import Skeleton from "@mui/icons-material/Skeleton";
 
 type SectionType = {
     title: string,
@@ -28,6 +29,14 @@ interface ModuleProps { // getStaticSideProps takes care of the data we need
     maxScore: number,
     userName: string,
 }
+
+const MultipleChoiceQuestion = React.lazy(() => import("./Questions/MultipleChoiceQuestion"));
+const PickMultipleQuestion = React.lazy(() => import("./Questions/PickMultipleQuestion"));
+const TrueFalseQuestion = React.lazy(() => import("./Questions/TrueFalseQuestion"));
+const ImageQuestion = React.lazy(() => import("./Questions/ImageQuestion"));
+const FillBlankQuestion = React.lazy(() => import("./Questions/FillBlankQuestion"));
+const PickImageQuestion = React.lazy(() => import("./Questions/PickImageQuestion"));
+
 
 export default function NewModule(props: any) {
     const [maxProgress, setMaxProgress] = useState([0, 0]); // Stores the max module & section progress so far
@@ -84,6 +93,28 @@ export default function NewModule(props: any) {
             history.back();
         }
     }
+    
+    function renderContent(content, slug): JSX.Element { // FIXME: Give me parameters!
+        if(content === "video") {
+            return <iframe></iframe>;
+        }
+        switch(content) {
+            case "mc": // Multiple Choice
+                return <MultipleChoiceQuestion {...slug}/>
+            case "pm": // Pick Multiple
+                return <PickMultipleQuestion {...slug}/>
+            case "tf": // True False
+                return <TrueFalseQuestion {...slug}/>
+            case "im": // Image Choice
+                return <ImageQuestion {...slug}/>
+            case "fb": // Fill in the Blank
+                return <FillBlankQuestion {...slug}/>
+            case "pi": // Pick Image
+                return <PickImageQuestion {...slug}/>
+            default:
+                return <div>ERROR</div>
+        }
+    }
 
     return(
     <Grid container spacing={2} sx={{ width: '100vw', height: '70vh'}}>
@@ -118,7 +149,9 @@ export default function NewModule(props: any) {
             elevation={8}
             sx={{height: '100%', boxSizing: 'border-box', padding: '20px'}}
         >
-            {content}
+            <Suspense fallback={<Skeleton />}>
+                {renderContent()}
+            </Suspense>
         </Paper>
     </Grid>
     <Grid item xs={12}>
