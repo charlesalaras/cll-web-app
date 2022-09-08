@@ -11,9 +11,8 @@ import Alert from "@mui/material/Alert";
 import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
 import FormLabel from "@mui/material/FormLabel";
+import TextField from "@mui/material/TextField";
 import FormHelperText from "@mui/material/FormHelperText";
 import Button from "@mui/material/Button";
 // Typescript Interface
@@ -59,20 +58,35 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
         return (<CircularProgress />);
     }
 
-    function checkAnswer() {
+    function checkAnswer(e) {
+        e.preventDefault();
 
     }
 
-    function createAnswers(answerBody: string, results = {}): JSX.Element {
+    function createAnswers(answerBody: string) {
         var str = answerBody;
         const regex = /\<<(.*?)\>>/gm;
         const objects = str.split(regex); // Split the string into components
-        const matches = [...str.matchAll(regex)].map(a => a[1]);
-        if(Object.keys(results).length === 0) { // Not a variant, fill out as normal
-             
-        }
-        // Variant, must find and replace
-
+        const matches = Array.from(str.matchAll(regex)).map(a => a[1]);
+        // FIXME: I'm not sure if this works... 
+        return (
+            <>
+            <div id="answers" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {objects.map((object) => {
+                    if(matches.includes(object)) return (
+                        <TextField 
+                            key={object}
+                            id={object} 
+                            label={object} 
+                            size="small"
+                            onChange={(e) => setAnswer({ ...answer, String(object): e.target.value,})}
+                            variant="filled">
+                        </TextField>);
+                    return <Latex>{object}</Latex>
+                })}
+            </div>
+            </>
+        );
     }
 
     return(
@@ -82,13 +96,11 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
         <form onSubmit={checkAnswer}>
         <FormControl>
         <FormLabel id="answers">Answers</FormLabel>
-        {Object.hasOwn(data, "smart") ? 
-            createAnswers(data.labels, variant.results) :
-            createAnswers(data.labels)
-        }
+        {createAnswers(data.labels)}
         <Button variant="contained" type="submit" disabled={attempts == 0 || correct}>Submit</Button>
         </FormControl>
         </form>
+        {answer}
         <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{attempts} attempts remaining.</Typography>
     </>
     );
