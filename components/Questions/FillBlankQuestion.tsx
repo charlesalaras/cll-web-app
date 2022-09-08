@@ -59,5 +59,37 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
         return (<CircularProgress />);
     }
 
-    return();
+    function checkAnswer() {
+
+    }
+
+    function createAnswers(answerBody: string, results = {}): JSX.Element {
+        var str = answerBody;
+        const regex = /\<<(.*?)\>>/gm;
+        const objects = str.split(regex); // Split the string into components
+        const matches = [...str.matchAll(regex)].map(a => a[1]);
+        if(Object.keys(results).length === 0) { // Not a variant, fill out as normal
+             
+        }
+        // Variant, must find and replace
+
+    }
+
+    return(
+    <>
+        <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
+        <br/>
+        <form onSubmit={checkAnswer}>
+        <FormControl>
+        <FormLabel id="answers">Answers</FormLabel>
+        {Object.hasOwn(data, "smart") ? 
+            createAnswers(data.labels, variant.results) :
+            createAnswers(data.labels)
+        }
+        <Button variant="contained" type="submit" disabled={attempts == 0 || correct}>Submit</Button>
+        </FormControl>
+        </form>
+        <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{attempts} attempts remaining.</Typography>
+    </>
+    );
 }
