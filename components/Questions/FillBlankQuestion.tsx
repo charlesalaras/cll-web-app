@@ -62,6 +62,16 @@ export default function FillBlankQuestion(props: QuestionProps) {
         e.preventDefault();
 
     }
+// https://stackoverflow.com/questions/46118340/i-cant-edit-text-field-in-material-ui
+    function recordAnswer(event, key: string) {
+        event.preventDefault();
+        var added = {
+            [key]: event.target.value,
+        };
+        var newAnswer = answer;
+        Object.assign(newAnswer, added);
+        setAnswer(newAnswer);
+    }
 
     function createAnswers(answerBody: string) {
         var str = answerBody;
@@ -79,7 +89,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
                             id={String(object)} 
                             label={String(object)} 
                             size="small"
-                            onChange={(e) => setAnswer(e.target.value)}
+                            onChange={(e) => recordAnswer(e, String(object))}
                             variant="filled">
                         </TextField>
                          : 
@@ -90,7 +100,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
             </>
         );
     }
-    console.log(data);
+
     return(
     <>
         <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
@@ -103,7 +113,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
         </FormControl>
         </form>
         {data.figures.map((figure) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
-        {String(answer)}
+        {JSON.stringify(answer)}
         <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{String(attempts)} attempts remaining.</Typography>
     </>
     );
