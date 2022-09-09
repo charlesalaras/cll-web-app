@@ -18,7 +18,7 @@ import Button from "@mui/material/Button";
 // Typescript Interface
 import { QuestionProps } from "./QuestionProps";
 
-export default function MultipleChoiceQuestion(props: QuestionProps) {
+export default function FillBlankQuestion(props: QuestionProps) {
     // Asynchronous Fetches
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
     const { mutate } = useSWRConfig();
@@ -44,7 +44,7 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
     useEffect(() => {
         if(!data) return;
         setAttempts(data.attempts);
-    }, [data.attempts]);
+    }, [data]);
     // Does question data exist?
     if(error) {
         return (
@@ -72,23 +72,25 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
         return (
             <>
             <div id="answers" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {objects.map((object) => {
-                    if(matches.includes(object)) return (
+                {Array.from(objects).map((object) => {
+                    return(matches.includes(object) == true ?
                         <TextField 
-                            key={object}
-                            id={object} 
-                            label={object} 
+                            key={String(object)}
+                            id={String(object)} 
+                            label={String(object)} 
                             size="small"
-                            onChange={(e) => setAnswer({ ...answer, String(object): e.target.value,})}
+                            onChange={(e) => setAnswer(e.target.value)}
                             variant="filled">
-                        </TextField>);
-                    return <Latex>{object}</Latex>
+                        </TextField>
+                         : 
+                        <Latex key={String(object)}>{String(object)}</Latex>
+                    )
                 })}
             </div>
             </>
         );
     }
-
+    console.log(data);
     return(
     <>
         <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
@@ -100,8 +102,9 @@ export default function MultipleChoiceQuestion(props: QuestionProps) {
         <Button variant="contained" type="submit" disabled={attempts == 0 || correct}>Submit</Button>
         </FormControl>
         </form>
-        {answer}
-        <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{attempts} attempts remaining.</Typography>
+        {data.figures.map((figure) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
+        {String(answer)}
+        <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{String(attempts)} attempts remaining.</Typography>
     </>
     );
 }

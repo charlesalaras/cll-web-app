@@ -10,10 +10,11 @@ interface QuestionParams {
 }
 // Function to replace all body parameters with respective values
 export const replaceParams = (body: string, params: QuestionParams) => {
+    if(params === undefined) return body;
     var p = body;
     const regex = /\{{(.*?)\}}/gm;
     const matches = p.matchAll(regex);
-    matches.forEach((match) => {
+    Array.from(matches).forEach((match) => {
         p = p.replace(match[0], params[match[1]]);
     });
     return p;
