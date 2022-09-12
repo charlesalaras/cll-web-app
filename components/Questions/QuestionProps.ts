@@ -1,6 +1,7 @@
 // Interface for props sent to any question
 export interface QuestionProps {
     identifier: string,
+    uuid: string,
 }
 // Fetcher function for useSWR hook
 export const fetcher =  async (url: string) => fetch(url).then((res) => res.json());
@@ -22,11 +23,12 @@ export const replaceParams = (body: string, params: QuestionParams) => {
 // Function to send a record of an attempt
 export const sendAttempt = (
     uuid: string,
+    score: number,
     correct: boolean,
     id: string,
-    variant: string = "",
     attempt: number,
-    answer: [string],
+    answer: {[key: string]: string},
+    variant: string,
     ) => {
     fetch('/api/sendAttempt', {
         method: 'POST',
@@ -35,6 +37,7 @@ export const sendAttempt = (
         },
         body: JSON.stringify({
             "uuid": uuid,
+            "score": score,
             "correct": correct,
             "id": id,
             "variant": variant,

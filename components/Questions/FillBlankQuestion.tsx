@@ -1,7 +1,7 @@
 // Logical Imports
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { fetcher, replaceParams } from "./QuestionProps";
+import { fetcher, replaceParams, sendAttempt } from "./QuestionProps";
 import useSWR, { useSWRConfig } from "swr";
 // Component Imports
 import Latex from "react-latex";
@@ -60,13 +60,42 @@ export default function FillBlankQuestion(props: QuestionProps) {
 
     function checkAnswer(e) {
         e.preventDefault();
-
+        // Check correct answer
+        const answers = Object.keys(answer).length;
+        var calcScore = 0;
+        var currCorrect = true;
+        for(var key in answer) {
+            //console.log(key + " -> " + answer[key]);
+            if(Object.hasOwn(variant.results, String(key)) && answer[key] == variant.results[key]) {
+                calcScore = calcScore + (1 / answers);
+            }
+            else {
+                currCorrect = false;
+            }
+        }
+        // Send record
+        /*
+        sendAttempt(
+            props.uuid,
+            calcScore,
+            currCorrect, 
+            props.identifier, 
+            attempts, 
+            answer, 
+            Object.hasOwn(data, "smart") == true ? String(variant.id) : "");
+        */
+        // Update status to user
+        currCorrect ? alert("Correct!") : alert("Incorrect.")
+        // Update states
+        setScore(calcScore);
+        setCorrect(true);
+        setAttempts(attempts - 1);
     }
 // https://stackoverflow.com/questions/46118340/i-cant-edit-text-field-in-material-ui
     function recordAnswer(event, key: string) {
         event.preventDefault();
         var added = {
-            [key]: event.target.value,
+            [key]: String(event.target.value).trim(),
         };
         var newAnswer = answer;
         Object.assign(newAnswer, added);
@@ -90,7 +119,9 @@ export default function FillBlankQuestion(props: QuestionProps) {
                             label={String(object)} 
                             size="small"
                             onChange={(e) => recordAnswer(e, String(object))}
-                            variant="filled">
+                            variant="filled"
+                            required
+                            >
                         </TextField>
                          : 
                         <Latex key={String(object)}>{String(object)}</Latex>
@@ -105,7 +136,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
     <>
         <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
         <br/>
-        <form onSubmit={checkAnswer}>
+        <form onSubmit={checkAnswer} noValidate autoComplete="off">
         <FormControl>
         <FormLabel id="answers">Answers</FormLabel>
         {createAnswers(data.labels)}
@@ -113,7 +144,6 @@ export default function FillBlankQuestion(props: QuestionProps) {
         </FormControl>
         </form>
         {data.figures.map((figure) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
-        {JSON.stringify(answer)}
         <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{String(attempts)} attempts remaining.</Typography>
     </>
     );
