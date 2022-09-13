@@ -1,6 +1,5 @@
 // Logical Imports
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { fetcher, replaceParams, sendAttempt } from "./QuestionProps";
 import useSWR, { useSWRConfig } from "swr";
 // Component Imports
@@ -17,33 +16,27 @@ import FormHelperText from "@mui/material/FormHelperText";
 import Button from "@mui/material/Button";
 // Typescript Interface
 import { QuestionProps } from "./QuestionProps";
-
+// FIXME: Need to load states from database if available
 export default function FillBlankQuestion(props: QuestionProps) {
     // Asynchronous Fetches
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
     const { mutate } = useSWRConfig();
-    const { data: session } = useSession();
     const [variant, setVariant] = useState({id: "", params: {}, results: {}});
     // Question Statistics
     const [score, setScore] = useState(0);
     const [correct, setCorrect] = useState(false);
-    const [attempts, setAttempts] = useState(-1);
+    const [attempts, setAttempts] = useState(0);
     const [duration, setDuration] = useState(Date.now());
     const [answer, setAnswer] = useState({});
     // Internal Values
     const [questionError, setError] = useState(false);
-    const [helperText, setHelperText] = useState("");
+    const [helperText, setHelperText] = useState(" ");
     // Dynamic questions use this to update its variant
     useEffect(() => {
         // Data non-existent
         if(!data) return;
         // Checks if question is dynamic, triggers only if data changed anyways
         if(Object.hasOwn(data, "smart")) setVariant({ id: data._id, params: data.params, results: data.results });
-    }, [data]);
-    // Checks if pertinent data exists
-    useEffect(() => {
-        if(!data) return;
-        setAttempts(data.attempts);
     }, [data]);
     // Does question data exist?
     if(error) {
@@ -58,15 +51,33 @@ export default function FillBlankQuestion(props: QuestionProps) {
         return (<CircularProgress />);
     }
 
-    function checkAnswer(e) {
+    const maxAttempts = data.attempts;
+
+    function checkAnswer(e: any) {
         e.preventDefault();
-        // Check correct answer
+        // Ensure an answer was existent
+        const keys = Object.keys(variant.results);
+        for(let key in keys) {
+            if(Object.hasOwn(answer, String(keys[key]))) { // Does the key exist in the object?
+                // @ts-ignore
+                if(answer[keys[key]] === "") {
+                    setHelperText("Please answer all blanks.");
+                    console.log("FAILED TOP WITH " + String(keys[key]));
+                    return;
+                }
+            } else { // Key wasn't existent at all
+                setHelperText("Please answer all blanks.");
+                console.log("FAILED BOTTOM WITH " + String(keys[key]));
+                return;
+            }
+        }
+        // Check correct answer FIXME
         const answers = Object.keys(answer).length;
         var calcScore = 0;
         var currCorrect = true;
-        for(var key in answer) {
-            //console.log(key + " -> " + answer[key]);
-            if(Object.hasOwn(variant.results, String(key)) && answer[key] == variant.results[key]) {
+        for(let key in answer) {
+            // @ts-ignore
+            if(Object.hasOwn(variant.results, String(key)) && answer[key] === variant.results[key]) {
                 calcScore = calcScore + (1 / answers);
             }
             else {
@@ -75,8 +86,11 @@ export default function FillBlankQuestion(props: QuestionProps) {
         }
         // Send record
         /*
+        const time = new Date(Date.now());
         sendAttempt(
             props.uuid,
+            time.toISOString(),
+            (Date.now() - duration) / 1000,
             calcScore,
             currCorrect, 
             props.identifier, 
@@ -85,14 +99,17 @@ export default function FillBlankQuestion(props: QuestionProps) {
             Object.hasOwn(data, "smart") == true ? String(variant.id) : "");
         */
         // Update status to user
-        currCorrect ? alert("Correct!") : alert("Incorrect.")
+        props.callback(calcScore, currCorrect);
         // Update states
-        setScore(calcScore);
-        setCorrect(true);
-        setAttempts(attempts - 1);
+        setScore(Math.max(score, calcScore));
+        setCorrect(currCorrect);
+        setAttempts(attempts + 1);
+        setDuration(Date.now());
+        // Update variant here if possible
+        if((attempts + 1) < maxAttempts) mutate('/api/questions/' + String(props.identifier));
     }
-// https://stackoverflow.com/questions/46118340/i-cant-edit-text-field-in-material-ui
-    function recordAnswer(event, key: string) {
+
+    function recordAnswer(event: any, key: string) {
         event.preventDefault();
         var added = {
             [key]: String(event.target.value).trim(),
@@ -107,7 +124,6 @@ export default function FillBlankQuestion(props: QuestionProps) {
         const regex = /\<<(.*?)\>>/gm;
         const objects = str.split(regex); // Split the string into components
         const matches = Array.from(str.matchAll(regex)).map(a => a[1]);
-        // FIXME: I'm not sure if this works... 
         return (
             <>
             <div id="answers" style={{ display: 'inline-flex', alignItems: 'center' }}>
@@ -140,11 +156,14 @@ export default function FillBlankQuestion(props: QuestionProps) {
         <FormControl>
         <FormLabel id="answers">Answers</FormLabel>
         {createAnswers(data.labels)}
-        <Button variant="contained" type="submit" disabled={attempts == 0 || correct}>Submit</Button>
+        <FormHelperText>{helperText}</FormHelperText>
+        <div>
+        <Button variant="contained" type="submit" size="large" disabled={attempts == maxAttempts || correct}>Submit</Button>
+        </div>
         </FormControl>
         </form>
-        {data.figures.map((figure) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
-        <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{String(attempts)} attempts remaining.</Typography>
+        {data.figures.map((figure: string) => <img key={figure} src={figure} style={{float: 'right'}} alt="Figure for Question"/>)}
+        <Typography variant="subtitle1" sx={{ color: 'warning.main'}}>{String(maxAttempts - attempts)} attempts remaining.</Typography>
     </>
     );
 }
