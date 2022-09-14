@@ -62,30 +62,28 @@ export default function FillBlankQuestion(props: QuestionProps) {
                 // @ts-ignore
                 if(answer[keys[key]] === "") {
                     setHelperText("Please answer all blanks.");
-                    console.log("FAILED TOP WITH " + String(keys[key]));
                     return;
                 }
             } else { // Key wasn't existent at all
                 setHelperText("Please answer all blanks.");
-                console.log("FAILED BOTTOM WITH " + String(keys[key]));
                 return;
             }
         }
         // Check correct answer FIXME
-        const answers = Object.keys(answer).length;
+        const answerSize = Object.keys(answer).length;
         var calcScore = 0;
         var currCorrect = true;
         for(let key in answer) {
             // @ts-ignore
-            if(Object.hasOwn(variant.results, String(key)) && answer[key] === variant.results[key]) {
-                calcScore = calcScore + (1 / answers);
+            if(Object.hasOwn(variant.results, String(key)) && String(answer[key]) === String(variant.results[key])) {
+                calcScore = calcScore + (1 / answerSize);
             }
             else {
                 currCorrect = false;
             }
         }
         // Send record
-        /*
+
         const time = new Date(Date.now());
         sendAttempt(
             props.uuid,
@@ -94,19 +92,23 @@ export default function FillBlankQuestion(props: QuestionProps) {
             calcScore,
             currCorrect, 
             props.identifier, 
-            attempts, 
+            attempts + 1, 
             answer, 
             Object.hasOwn(data, "smart") == true ? String(variant.id) : "");
-        */
-        // Update status to user
-        props.callback(calcScore, currCorrect);
+
+        // Tell module about question status
+        if((attempts + 1) >= maxAttempts || currCorrect) {
+            props.callback(calcScore);
+        }
         // Update states
         setScore(Math.max(score, calcScore));
         setCorrect(currCorrect);
         setAttempts(attempts + 1);
         setDuration(Date.now());
         // Update variant here if possible
-        if((attempts + 1) < maxAttempts) mutate('/api/questions/' + String(props.identifier));
+        if((attempts + 1) < maxAttempts && !currCorrect) { 
+            mutate('/api/questions/' + String(props.identifier));
+        }
     }
 
     function recordAnswer(event: any, key: string) {
