@@ -106,7 +106,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
         setAttempts(attempts + 1);
         setDuration(Date.now());
         // Update variant here if possible
-        if((attempts + 1) < maxAttempts && !currCorrect) { 
+        if((attempts + 1) < maxAttempts && !currCorrect && Object.hasOwn(data, "smart")) { 
             mutate('/api/questions/' + String(props.identifier));
         }
     }
