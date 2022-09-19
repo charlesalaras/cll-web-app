@@ -1,4 +1,5 @@
 // Logical Imports
+import React from "react";
 import { useEffect, useState } from "react";
 import { fetcher, replaceParams, sendAttempt } from "./QuestionProps";
 import useSWR, { useSWRConfig } from "swr";
@@ -11,7 +12,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import FormControl from "@mui/material/FormControl";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormLabel from "@mui/material/FormLabel";
-import TextField from "@mui/material/TextField";
+import RadioGroup from "@mui/material/RadioGroup";
+import Radio from "@mui/material/Radio";
 import FormHelperText from "@mui/material/FormHelperText";
 import Button from "@mui/material/Button";
 // Typescript Interface
@@ -27,7 +29,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
     const [correct, setCorrect] = useState(false);
     const [attempts, setAttempts] = useState(0);
     const [duration, setDuration] = useState(Date.now());
-    const [answer, setAnswer] = useState({});
+    const [answer, setAnswer] = useState("");
     // Internal Values
     const [questionError, setError] = useState(false);
     const [helperText, setHelperText] = useState(" ");
@@ -36,7 +38,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
         // Data non-existent
         if(!data) return;
         // Checks if question is dynamic, triggers only if data changed anyways
-        if(Object.hasOwn(data, "smart")) setVariant({ id: data._id, params: data.params, results: data.results, correct: data.correct });
+        if(Object.hasOwn(data, "smart")) setVariant({ id: data._id, params: data.params });
     }, [data]);
     // Does question data exist?
     if(error) {
@@ -58,17 +60,19 @@ export default function FillBlankQuestion(props: QuestionProps) {
         // Ensure an answer was existent
         if(answer === "") {
             setHelperText("Please select an answer.");
+            setError(true);
             return;
         }
         // Check correct answer
         var calcScore = 0;
         var currCorrect = false;
-        if(answer === data.correct) {
+        if(answer === String(data.correct)) {
             currCorrect = true;
             calcScore = 1;
         }
         // Send record
         const time = new Date(Date.now());
+
         sendAttempt(
             props.uuid,
             time.toISOString(),
@@ -77,12 +81,12 @@ export default function FillBlankQuestion(props: QuestionProps) {
             currCorrect, 
             props.identifier, 
             attempts + 1, 
-            answer, 
+            {answer: answer}, 
             Object.hasOwn(data, "smart") == true ? String(variant.id) : "");
 
         // Tell module about question status
         if((attempts + 1) >= maxAttempts || currCorrect) {
-            props.callback(calcScore);
+            props.callback(calcScore, currCorrect);
         }
         // Update states
         setScore(Math.max(score, calcScore));
@@ -94,41 +98,29 @@ export default function FillBlankQuestion(props: QuestionProps) {
             mutate('/api/questions/' + String(props.identifier));
         }
     }
-
-    function recordAnswer(event: any, key: string) {
-        event.preventDefault();
-        var added = {
-            [key]: String(event.target.value).trim(),
-        };
-        var newAnswer = answer;
-        Object.assign(newAnswer, added);
-        setAnswer(newAnswer);
+    
+    const handleRadioChange = (event: any) => {
+        setAnswer((event.target as HTMLInputElement).value);
+        setHelperText(' ');
+        setError(false);
     }
 
-    function createAnswers(answerBody: string) {
-        var str = answerBody;
-        const regex = /\<<(.*?)\>>/gm;
-        const objects = str.split(regex); // Split the string into components
-        const matches = Array.from(str.matchAll(regex)).map(a => a[1]);
+    function createAnswers(params: string[]) {
         return (
             <>
             <div id="answers" style={{ display: 'inline-flex', alignItems: 'center' }}>
-                {Array.from(objects).map((object) => {
-                    return(matches.includes(object) == true ?
-                        <TextField 
-                            key={String(object)}
-                            id={String(object)} 
-                            label={String(object)} 
-                            size="small"
-                            onChange={(e) => recordAnswer(e, String(object))}
-                            variant="filled"
-                            required
-                            >
-                        </TextField>
-                         : 
-                        <Latex key={String(object)}>{String(object)}</Latex>
-                    )
-                })}
+                    {Array.from(params).map((object) => {
+                        return(
+                            <>
+                            <FormControlLabel 
+                                value={object} 
+                                control={<Radio />} 
+                                label={<Latex>{object}</Latex>}
+                                onChange={handleRadioChange}
+                            />
+                            </>
+                        );
+                    })}
             </div>
             </>
         );
@@ -139,9 +131,11 @@ export default function FillBlankQuestion(props: QuestionProps) {
         <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
         <br/>
         <form onSubmit={checkAnswer} noValidate autoComplete="off">
-        <FormControl>
+        <FormControl error={questionError}>
         <FormLabel id="answers">Answers</FormLabel>
-        {createAnswers(data.labels)}
+        <RadioGroup>
+        {createAnswers(data.answers)}
+        </RadioGroup>
         <FormHelperText>{helperText}</FormHelperText>
         <div>
         <Button variant="contained" type="submit" size="large" disabled={attempts == maxAttempts || correct}>Submit</Button>

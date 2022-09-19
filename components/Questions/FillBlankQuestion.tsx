@@ -62,10 +62,12 @@ export default function FillBlankQuestion(props: QuestionProps) {
                 // @ts-ignore
                 if(answer[keys[key]] === "") {
                     setHelperText("Please answer all blanks.");
+                    setError(true);
                     return;
                 }
             } else { // Key wasn't existent at all
                 setHelperText("Please answer all blanks.");
+                setError(true);
                 return;
             }
         }
@@ -98,7 +100,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
 
         // Tell module about question status
         if((attempts + 1) >= maxAttempts || currCorrect) {
-            props.callback(calcScore);
+            props.callback(calcScore, currCorrect);
         }
         // Update states
         setScore(Math.max(score, calcScore));
@@ -119,6 +121,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
         var newAnswer = answer;
         Object.assign(newAnswer, added);
         setAnswer(newAnswer);
+        setError(false);
     }
 
     function createAnswers(answerBody: string) {
@@ -155,7 +158,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
         <Latex>{Object.hasOwn(data, "smart") ? replaceParams(data.body, variant.params) : data.body}</Latex>
         <br/>
         <form onSubmit={checkAnswer} noValidate autoComplete="off">
-        <FormControl>
+        <FormControl error={questionError}>
         <FormLabel id="answers">Answers</FormLabel>
         {createAnswers(data.labels)}
         <FormHelperText>{helperText}</FormHelperText>
