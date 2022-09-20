@@ -19,7 +19,7 @@ import Button from "@mui/material/Button";
 // Typescript Interface
 import { QuestionProps } from "./QuestionProps";
 // FIXME: Need to load states from database if available
-export default function FillBlankQuestion(props: QuestionProps) {
+export default function MultipleChoiceQuestion(props: QuestionProps) {
     // Asynchronous Fetches
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
     const { mutate } = useSWRConfig();
@@ -108,7 +108,7 @@ export default function FillBlankQuestion(props: QuestionProps) {
     function createAnswers(params: string[]) {
         return (
             <>
-            <div id="answers" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <div id="answers">
                     {Array.from(params).map((object) => {
                         return(
                             <>
