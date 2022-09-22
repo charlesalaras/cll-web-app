@@ -5,6 +5,8 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
 
 interface BuilderProps {
     callback: Function,
@@ -21,17 +23,26 @@ const questionTypes = [
 
 export default function Builder() {
     return(
-        <>
+        <Box sx={{ flexGrow: 1, padding: "10px" }}>
         <FormControl fullWidth>
         <InputLabel>Question Type</InputLabel>
-        <Select label="Question Type">
-            {questionTypes.map((type: any, i: number) => {
-                return(
-                    <MenuItem key={String(i)} value={type.value}>{type.label}</MenuItem>
-                );
-            })}
-        </Select>
+        <Grid 
+            container 
+            spacing={2}
+            justifyContent="center"
+            alignItems="center"
+        >
+            <Grid item xs={12}>
+            <Select label="Question Type" fullWidth>
+                {questionTypes.map((type: any, i: number) => {
+                    return(
+                        <MenuItem key={String(i)} value={type.value}>{type.label}</MenuItem>
+                    );
+                })}
+            </Select>
+            </Grid>
+        </Grid>
         </FormControl>
-        </>
+        </Box>
     );
 }
