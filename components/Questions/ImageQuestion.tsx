@@ -23,7 +23,7 @@ export default function ImageQuestion(props: QuestionProps) {
     // Asynchronous Fetches
     const { data, error } = useSWR("/api/questions/" + String(props.identifier), fetcher);
     const { mutate } = useSWRConfig();
-    const [variant, setVariant] = useState({id: "", params: {}, results: {}});
+    const [variant, setVariant] = useState({id: "", params: {}});
     // Question Statistics
     const [score, setScore] = useState(0);
     const [correct, setCorrect] = useState(false);
