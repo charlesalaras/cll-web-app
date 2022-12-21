@@ -1,10 +1,7 @@
-import { connectToDatabase } from "../util/mongodb";
-import Head from "next/head";
-import NewModule from "../components/NewModule";
-import NavBar from "../components/NavBar";
+import { useSupabaseClient } from '@supabase/auth-helpers-react'
 
+export default function TestModule({ question }) {
 
-export default function TestModule({ module }) {
     return(
         <>
         <Head>
@@ -15,21 +12,27 @@ export default function TestModule({ module }) {
         </Head>
 
         <NavBar/>
-        <NewModule {... module }/>
         </>
     );
 }
 
-export async function getServerSideProps() {
-    const { db } = await connectToDatabase();
+export async function getServerSideProps(ctx) {
+    const supabase = useSupabaseClient(ctx);
+    
+    const { data, error } = await supabase.from("questions").select('*').single();
 
-    const module = await db
-        .collection("modules")
-        .findOne({})
+    if(error) {
+        console.log("ERROR: " + error.message);
+        return {
+            props: {
+                question: null,
+            }
+        }
+    }
 
     return {
-        props: { 
-            module: JSON.parse(JSON.stringify(module))
-        },
-    };
+        props: {
+            question: data,
+        }
+    }
 }
