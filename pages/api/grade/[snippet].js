@@ -3,6 +3,10 @@ import fs from 'fs'
 import { createClient } from '@supabase/supabase-js'
 
 export default async(req, res) => {
+    if(req.method !== 'POST') {
+        res.status(405).send({ message: 'POST ONLY'})
+        return
+    }
     const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY);
     // Access filename from request
     const { snippet } = req.query;
@@ -22,7 +26,9 @@ export default async(req, res) => {
     // Run the new file in a Python forked process
     const { execFile } = require('node:child_process');
     let answer;
-    const python = execFile('python3' ['driver.py', '--generate', snippet], (error, stdout, stderr) => {
+    const params = JSON.stringify(req.body["params"]);
+    const answers = String(req.body["answer"]);
+    const python = execFile('python3' ['driver.py', '--grade', snippet, params, answers], (error, stdout, stderr) => {
         if(error) {
             console.log(error);
         }
