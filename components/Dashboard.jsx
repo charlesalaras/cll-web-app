@@ -4,9 +4,10 @@ import { useUser, useSupabaseClient } from '@supabase/auth-helpers-react'
 export default function Dashboard({ session }) {
     const supabase = useSupabaseClient()
     const user = useUser()
-    const [loading, setLoading] = useState(true);
+    //const [loading, setLoading] = useState(true);
     
     const [username, setName] = useState(null)
+    const [email, setEmail] = useState(null)
     const [courses, setCourses] = useState([])
 
     useEffect(() => {
@@ -14,35 +15,30 @@ export default function Dashboard({ session }) {
     }, [session])
 
     async function getProfile() {
-        try {
-            setLoading(true)
-           
-            let { data, error, status } = await supabase
+        console.log(user)
+        if(user) {
+            const { data, error } = await supabase
                 .from('profiles')
-                .select(`username, courses`)
-                .eq('id', user.id)
-                .single()
+                .upsert({ id: user.id, full_name: user.user_metadata.full_name, email: user.user_metadata.email })
+                .select()
 
-            if(error && status !== 406) {
-                throw error
-            }
+            if(error) alert("ERROR: Could not upsert account")
+
             if(data) {
-                // Update user data variables here
-                setName(data.name)
-                setCourses(data.courses)
+                setName(data[0].full_name);
+                setEmail(data[0].email);
+                setCourses(data[0].courses);
             }
-        } catch (error) {
-            alert('Error loading user data!')
-            console.log(error)
-        } finally {
-            setLoading(false)
         }
     }
 
     return(
         <div>
-            <p>{username}</p>
-            <p>{courses}</p>
+            <p>Hello there!</p>
+            <p>User: {username}</p>
+            <p>Email: {email}</p>
+            <p>Courses: {courses}</p>
+            <button onClick={() => supabase.auth.signOut()}>Sign Out</button>
         </div>
     );
 }

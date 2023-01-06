@@ -7,7 +7,7 @@ export default function Home() {
     const supabase = useSupabaseClient()
 
     return(
-        <div>
+        <div id="container">
         {!session ? (
             <>
             <div>
