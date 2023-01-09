@@ -10,7 +10,7 @@ import InputLabel from "@mui/material/InputLabel";
 import { makeStyles } from '@material-ui/core'
 import Button from "@mui/material/Button";
 import Container from '@material-ui/core/Container'
-
+import Radio from '@mui/material/Radio';
 import Builder from "../components/BuilderForm";
 
 const useStyles = makeStyles({
@@ -31,6 +31,19 @@ export default function QuestionBuilder() {
     const [questionTitle, setTitle] = useState('')
     const [questionBody, setBody] = useState('')
     const [questionType, setType] = useState('')
+    const [selectedAnswer, setSelectedAnswer] = useState('')
+    let string1 = 'Answer '
+    let choice = 'A'
+
+    // const titleHandler = (event) => {
+    //     //const questionTitle = useState('');
+    //     const questionTitle = useState({textValue: event.target.value});
+    //     this.textValue = event.target.value;
+    // }
+
+    const handleChange = (event) => {
+        setSelectedAnswer(event.target.value);
+    }
 
     
     return(
@@ -40,7 +53,7 @@ export default function QuestionBuilder() {
                 <Paper>
                   
                 <Typography
-                    variant="h6"
+                    variant="h2"
                     component="h2"
                     gutterBottom
                 >
@@ -51,6 +64,7 @@ export default function QuestionBuilder() {
                     
                     <TextField
                         onChange={(e) => setTitle(e.target.value)}
+                        value={questionTitle}
                         className={classes.field}
                         label="Question Title"
                         variant="filled"
@@ -85,11 +99,104 @@ export default function QuestionBuilder() {
                         required
                     />
 
+                    <div>
+                        {
+                            questionType == "MultipleChoice" ? 
+                                <div>
+                                    <TextField
+                                        onChange={(e) => setBody(e.target.value)}
+                                        className={classes.field}
+                                        label={string1.concat(choice)}
+                                        variant="filled"
+                                        multiline
+                                        fullWidth
+                                        required
+                                    />
+
+                                </div> : <div></div>
+                        }
+                        {
+                            questionType == "TrueFalse" ?
+                                <div>
+                                    <Grid item>
+                                        <Radio
+                                            checked={selectedAnswer === 'a'}
+                                            onChange={handleChange}
+                                            value="a"
+                                            name="radio-buttons"
+                                            inputProps={{ 'aria-label': 'A' }}
+                                        />
+                                        <TextField
+                                            onChange={(e) => setBody(e.target.value)}
+                                            className={classes.field}
+                                            label="Choice A"
+                                            variant="filled"
+                                            multiline
+                                            fullWidth
+                                            required
+                                        />
+                                    </Grid>
+                                        <TextField
+                                            onChange={(e) => setBody(e.target.value)}
+                                            className={classes.field}
+                                            label="Choice B"
+                                            variant="filled"
+                                            multiline
+                                            fullWidth
+                                            required
+                                        />
+                                    
+                                </div> : <div></div>
+                        }
+                    </div>
+
                 </form>
                 </Paper>
+
             </Grid>
+            <Grid item lg={6}>
+                <Paper>
+                  
+                <Typography
+                    variant="h2"
+                    sx = {{
+                        width: "100%",
+                        overflow: "auto",
+                        wordBreak: "break-word"
+                    }}
+                    gutterBottom
+                >
+                    {questionTitle}
+                </Typography>
+
+                <Typography
+                    variant="h6"
+                    sx = {{
+                        width: "100%",
+                        overflow: "auto",
+                        wordBreak: "break-word"
+                    }}
+                    gutterBottom
+                >
+                    {questionType}
+                </Typography>
+
+                <Typography
+                    variant="body1"
+                    sx = {{
+                        width: "100%",
+                        overflow: "auto",
+                        wordBreak: "break-word"
+                    }}
+                    gutterBottom
+                >
+                    {questionBody}
+                </Typography>
 
 
+                </Paper>
+                
+            </Grid>
         </Grid>
     );
 }
