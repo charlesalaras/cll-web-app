@@ -12,7 +12,6 @@ import Button from '@mui/material/Button';
 import DarkMode from "@mui/icons-material/DarkMode";
 import Logo from '../public/logo.svg';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
-import { useSession, signOut } from 'next-auth/react';
 
 const pages = ["Dashboard", "Assignments", "Performance", "Practice"];
 

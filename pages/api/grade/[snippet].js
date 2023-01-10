@@ -27,7 +27,7 @@ export default async(req, res) => {
     const { execFile } = require('node:child_process');
     let answer;
     const params = JSON.stringify(req.body["params"]);
-    const answers = String(req.body["answer"]);
+    const answers = JSON.stringify({"answer": req.body["answer"]});
     const python = execFile('python3' ['driver.py', '--grade', snippet, params, answers], (error, stdout, stderr) => {
         if(error) {
             console.log(error);
